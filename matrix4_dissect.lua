@@ -26,8 +26,8 @@ vs_cmds = {
 local p_mtx4 = Proto("schmtx4", "SCH Matrix4")
 
 local f_cmd    = ProtoField.uint16("schmtx4.cmd"   , "Command"   , base.HEX, vs_cmds)
-local f_magic  = ProtoField.uint16("schmtx4.magic" , "Magic bytes")
-local f_data   = ProtoField.string("schmtx4.data"  , "Data"      , base.HEX)
+local f_magic  = ProtoField.string("schmtx4.magic" , "Magic bytes")
+local f_data   = ProtoField.string("schmtx4.data"  , "Data")
 
 p_mtx4.fields = { f_cmd, f_magic, f_data }
 
@@ -40,7 +40,9 @@ local d_data = Dissector.get("data")
 -- Main dissector function
 function p_mtx4.dissector(buf, pinfo, tree)
 	local t_mtx4=tree:add(p_mtx4, buf())
-	t_mtx4:add_le(f_magic, buf(0, 3))
+	pinfo.cols.protocol="SCHMTX4"
+	t_mtx4:add(f_magic, buf(0, 3))
+	t_mtx4:add(f_cmd, buf(3, 2))
 --	i_repl=buf(6, 2):le_uint()
 --	if i_cmd == 11 then
 --		t_mtx4:add(f_text, buf(8))
